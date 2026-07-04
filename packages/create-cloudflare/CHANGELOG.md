@@ -1,5 +1,21 @@
 # create-cloudflare
 
+## 2.70.8
+
+### Patch Changes
+
+- [#14544](https://github.com/cloudflare/workers-sdk/pull/14544) [`53f5a59`](https://github.com/cloudflare/workers-sdk/commit/53f5a599a4b91f4caa9ab08c638d3e19e6b702d2) Thanks [@petebacondarwin](https://github.com/petebacondarwin)! - Fix scaffolding of Qwik projects when `@cloudflare/workers-types` v5 is installed
+
+  `@cloudflare/workers-types` v5 removed the date-versioned entrypoints (e.g. `@cloudflare/workers-types/2024-01-01`) in favour of a single bare package import. C3 previously only added a date-versioned entrypoint to `tsconfig.json` and skipped updating the config entirely when none could be found, leaving templates that install workers-types (such as Qwik) without any Cloudflare types.
+
+  C3 now falls back to adding the bare `@cloudflare/workers-types` entry when no date-versioned entrypoint is available, so the correct types are always configured regardless of the installed version.
+
+- [#14492](https://github.com/cloudflare/workers-sdk/pull/14492) [`1ac96a1`](https://github.com/cloudflare/workers-sdk/commit/1ac96a14b7fb022acada114ab8793fe8a4ba79a5) Thanks [@penalosa](https://github.com/penalosa)! - Replace the CommonJS `xdg-app-paths` dependency with a vendored pure-ESM implementation
+
+  `xdg-app-paths` (and its `xdg-portable`/`os-paths` dependencies) are CommonJS only, which caused "Dynamic require of 'path' is not supported" errors when the surrounding code was bundled to ESM. The global config/cache directory resolution is now provided by a small, dependency-free pure-ESM module in `@cloudflare/workers-utils` that reproduces the previous path resolution exactly (verified against the real package in unit tests), so existing config and credential locations are unchanged. This also drops the transitive `fsevents` optional dependency that `xdg-app-paths` pulled in.
+
+  Miniflare and create-cloudflare now consume the shared helpers from `@cloudflare/workers-utils` instead of maintaining their own copies, importing node-only leaf entry points (`@cloudflare/workers-utils/fs-helpers`, `@cloudflare/workers-utils/global-wrangler-config-path`) where ESM bundling is required.
+
 ## 2.70.7
 
 ### Patch Changes
